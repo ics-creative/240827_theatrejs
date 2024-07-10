@@ -1,0 +1,62 @@
+* {
+  margin: 0;
+}
+
+.mv {
+  position: sticky;
+  top: 0;
+  z-index: -1;
+  height: 100vh;
+
+  .mv-logo {
+    position: absolute;
+    top: 20%;
+    left: 30%;
+    font-size: 50px;
+    color: #ffc689;
+  }
+}
+
+.navigation {
+  position: sticky;
+  top: 16px;
+  margin-left: 16px;
+  font-size: 24px;
+
+  ul {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 200px;
+    padding: 12px;
+    background-color: rgb(255 255 255 / 20%);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    border: 2px solid rgb(255 255 255 / 30%);
+    border-radius: 10px;
+
+    li {
+      display: inline;
+
+      a {
+        color: #e7d36e;
+        text-underline-offset: 4px;
+      }
+    }
+  }
+}
+
+h2 {
+  color: #ff90e3;
+}
+
+.section {
+  height: 100vh;
+  padding: 32px;
+}
+
+.header,
+.footer {
+  height: 100px;
+  background-color: #ffbb90;
+}
