@@ -2,8 +2,13 @@ import "./style.css";
 import * as THREE from "three";
 import studio from "@theatre/studio";
 import { getProject, types } from "@theatre/core";
+import { FontLoader } from "three/addons/loaders/FontLoader.js";
+import { TextGeometry } from "three/addons/geometries/TextGeometry.js";
+import fontData from "@compai/font-fugaz-one/data/typefaces/normal-400.json"; // @see https://components.ai/docs/typefaces/packages
+import * as BufferGeometryUtils from "three/addons/utils/BufferGeometryUtils.js";
 
-import projectState from "./state.json";
+// 書き出したJSONファイルを参照する場合
+import projectState from "./assets/state.json";
 
 let increment,
   mouseX,
@@ -13,46 +18,46 @@ let increment,
 studio.initialize();
 
 // プロジェクトを取得
-// const project = getProject("THREE.js x Theatre.js"); //ローカルストレージに保存されたアニメーションを参照
-const project = getProject("THREE.js x Theatre.js", { state: projectState }); // エキスポートしたjsonからアニメーションを参照
+const project = getProject("THREE.js x Theatre.js"); //ローカルストレージに保存されたアニメーションを参照
+// const project = getProject("THREE.js x Theatre.js", { state: projectState }); // エキスポートしたjsonからアニメーションを参照
 
 // シートを作成
 const sheet = project.sheet("Animated scene");
+const sheet2 = project.sheet("Cube animation");
 
 // ロード後に一回再生
-project.ready.then(() =>sheet.sequence.play({ iterationCount: Infinity })); // ループ再生
+// project.ready.then(() => sheet.sequence.play({ iterationCount: Infinity })); // ループ再生
 
-const button = document.querySelector("#button");
-// button.addEventListener("click", () => {
-//   sheet.sequence.play().then(() => {
-//     // アニメーション後の何かの処理
-//     console.log("fin");
-//   });
-// });
-
-// button.addEventListener("click", async () => {
-//   await sheet.sequence.play();
-//   console.log("fin");
-// });
+const about = document.querySelector("#nav-about");
+const works = document.querySelector("#nav-works");
+const contact = document.querySelector("#nav-contact");
+about.addEventListener("click", () => {
+  sheet2.sequence.play();
+});
 
 /**
  * Three.jsのセットアップ
  */
 // シーンを作成
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x1d1d26);
+scene.background = new THREE.Color("#1d1d26");
+// フォグを設定
+scene.fog = new THREE.Fog("#000000", 50, 1000); // (色, 開始距離, 終点距離);
+
 // カメラを作成：THREE.PerspectiveCamera(視野角, アスペクト比, near, far)
 const camera = new THREE.PerspectiveCamera(
   45,
   document.body.clientWidth / window.innerHeight, // document.body.clientWidth：スクロールバーを抜いた幅
   1,
-  200,
+  1000,
 );
 
 // メッシュ
-const geometry = new THREE.TorusKnotGeometry(10, 1, 300, 16, 2, 5);
-const material = new THREE.MeshStandardMaterial({ color: "#f00" });
-material.emissive = new THREE.Color("#049ef4");
+const geometry = new THREE.TorusKnotGeometry(16, 1, 300, 16, 2, 5);
+const material = new THREE.MeshStandardMaterial({
+  color: "#ff9900",
+  emissive: "#049ef4",
+});
 const mesh = new THREE.Mesh(geometry, material);
 scene.add(mesh);
 
@@ -66,13 +71,13 @@ meshBall.rotation.y = Math.PI * 0.1;
 
 /**
  *　Theatre.jsでアニメーションをさせるための定義
+ *
+ * シートid "Animated scene"
  */
 const torusKnotObj = sheet.object("Torus Knot", {
-  // ラジアン！　(360度: 2 * Math.PI)
-
-  // GUIからの入力ができるよう変更させる回転を定義しておく
+  // GUIから入力ができるよう変更させる回転を定義
   rotation: types.compound({
-    x: types.number(mesh.rotation.x, { range: [-2, 2] }), // −360〜 360度
+    x: types.number(mesh.rotation.x, { range: [-2, 2] }), // −360 〜 360度 の想定
     y: types.number(mesh.rotation.y, { range: [-2, 2] }),
     z: types.number(mesh.rotation.z, { range: [-2, 2] }),
   }),
@@ -102,44 +107,132 @@ torusKnotObj.onValuesChange((values) => {
 
   const { ballY } = values.ballPos;
   meshBall.position.y = mouseY + ballY;
-  // meshBall.position.y = Math.sin(increment * 0.1) +ballY
 });
 
 /**
- * Lights
+ * シートid "Cube Animation" のアニメーション定義
  */
-// Ambient Light
-const ambientLight = new THREE.AmbientLight("#ffffff", 0.5);
+// キューブをシーンに追加
+const cubeSize = 7;
+const cubeGeometry = new THREE.BoxGeometry(cubeSize, cubeSize, cubeSize);
+const cube = new THREE.Mesh(cubeGeometry, material);
+scene.add(cube);
+
+const cubeObj = sheet2.object("Cube", {
+  // GUIから入力ができるよう変更させる回転を定義しておく
+  rotation: types.compound({
+    x: types.number(cube.rotation.x, { range: [-2, 2] }),
+    y: types.number(cube.rotation.y, { range: [-2, 2] }),
+    z: types.number(cube.rotation.z, { range: [-2, 2] }),
+  }),
+  position: types.compound({
+    sx: types.number(cube.position.x, { range: [-100, 100] }),
+    sy: types.number(cube.position.y, { range: [-100, 100] }),
+    sz: types.number(cube.position.z, { range: [-100, 100] }),
+  }),
+});
+
+cubeObj.onValuesChange((values) => {
+  const { x, y, z } = values.rotation;
+  const { sx, sy, sz } = values.position;
+  cube.rotation.set(x * Math.PI, y * Math.PI, z * Math.PI);
+  cube.position.set(sx, sy, sz);
+});
+
+/**
+ * 文字
+ */
+const font = new FontLoader().parse(fontData);
+const textGeometry = new TextGeometry("Hello world!", {
+  font: font,
+  size: 30,
+  depth: 3,
+  curveSegments: 12,
+  bevelEnabled: true,
+  bevelThickness: 2,
+  bevelSize: 1.8, // 数値が大きいほど膨張した感じになる
+  bevelOffset: 0,
+  bevelSegments: 5,
+});
+textGeometry.center(); // テキストを中心揃え
+
+// そのままのTextGeometryだと表面がフラットでガタガタして見えるので、スムースシェーディングになるよう調整
+const textGeometry2 = textGeometry.clone().deleteAttribute("normal");
+const textGeometry3 = BufferGeometryUtils.mergeVertices(textGeometry2);
+textGeometry3.computeVertexNormals();
+const text = new THREE.Mesh(textGeometry3, material);
+text.position.z = -50;
+scene.add(text);
+
+/**
+ * 地面
+ */
+const cylinderGeometry = new THREE.CylinderGeometry(30, 32, 7, 48);
+const cylinder = new THREE.Mesh(cylinderGeometry, material);
+cylinder.position.y = -30;
+scene.add(cylinder);
+
+/**
+ *
+ */
+const sphereGeometry = new THREE.SphereGeometry(5, 32, 32);
+const sphere = new THREE.Mesh(sphereGeometry, material);
+sphere.position.x = -20;
+scene.add(sphere);
+
+const torusGeometry = new THREE.TorusGeometry(3.5, 2.2, 16, 32);
+const torus = new THREE.Mesh(torusGeometry, material);
+torus.position.x = 20;
+scene.add(torus);
+
+// https://jsfiddle.net/prisoner849/pjb3cdm8/
+const angleStep = Math.PI * 0.5;
+const radius = 1;
+const shape = new THREE.Shape()
+  .absarc(2, 2, radius, angleStep * 0, angleStep * 1)
+  .absarc(-2, 2, radius, angleStep * 1, angleStep * 2)
+  .absarc(-2, -2, radius, angleStep * 2, angleStep * 3)
+  .absarc(2, -2, radius, angleStep * 3, angleStep * 4);
+const triangleShape = new THREE.Shape()
+  .moveTo(0, -3.45)
+  .lineTo(-4, 3.45)
+  .lineTo(4, 3.45)
+  .lineTo(0, -3.45);
+
+const extrudeSettings = {
+  depth: 3,
+  bevelEnabled: true,
+  bevelThickness: 0.2,
+  bevelSize: 0.5,
+  bevelSegments: 5,
+  curveSegments: 12,
+};
+const roundRectGeometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+const roundRectGeometry2 = roundRectGeometry.clone().deleteAttribute("normal");
+const roundRectGeometry3 =
+  BufferGeometryUtils.mergeVertices(roundRectGeometry2);
+roundRectGeometry3.computeVertexNormals();
+const roundRect = new THREE.Mesh(roundRectGeometry3, material);
+roundRect.rotation.z = Math.PI * 0.5;
+roundRect.position.y = 10;
+scene.add(roundRect);
+
+/**
+ * ライティング
+ */
+// 環境光源
+const ambientLight = new THREE.AmbientLight("#ffffff", 1);
 scene.add(ambientLight);
 
-// Point light
-const directionalLight = new THREE.DirectionalLight("#ff0000", 30 /* , 0, 1 */);
-directionalLight.position.y = 20;
-directionalLight.position.z = 20;
-
-directionalLight.castShadow = true;
-
-directionalLight.shadow.mapSize.width = 2048;
-directionalLight.shadow.mapSize.height = 2048;
-directionalLight.shadow.camera.far = 50;
-directionalLight.shadow.camera.near = 1;
-directionalLight.shadow.camera.top = 20;
-directionalLight.shadow.camera.right = 20;
-directionalLight.shadow.camera.bottom = -20;
-directionalLight.shadow.camera.left = -20;
-
-scene.add(directionalLight);
-
 // RectAreaLight
-const rectAreaLight = new THREE.RectAreaLight("#ff0", 1, 50, 50);
-
-rectAreaLight.position.z = 10;
-rectAreaLight.position.y = -40;
-rectAreaLight.position.x = -20;
-rectAreaLight.lookAt(new THREE.Vector3(0, 0, 0));
-
+const rectAreaLight = new THREE.RectAreaLight("#ff0", 10, 50, 50);
+rectAreaLight.position.set(-20, 40, 10);
+rectAreaLight.lookAt(new THREE.Vector3(0, 0, 0)); // 座標原点の方を照らす
 scene.add(rectAreaLight);
 
+/**
+ * レンダラー
+ */
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;

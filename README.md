@@ -6,3 +6,5 @@ ICS MEDIAの記事『』のサンプルコードです。
 
 - [Theatre.js](https://www.theatrejs.com/)
 - [three.js](https://threejs.org/)
+
+## 使用フォント
