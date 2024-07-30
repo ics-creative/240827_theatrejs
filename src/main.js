@@ -7,8 +7,8 @@ import { TextGeometry } from "three/addons/geometries/TextGeometry.js";
 import fontData from "@compai/font-fugaz-one/data/typefaces/normal-400.json"; // @see https://components.ai/docs/typefaces/packages
 import * as BufferGeometryUtils from "three/addons/utils/BufferGeometryUtils.js";
 
-// 書き出したJSONファイルを参照する場合
-import projectState from "./assets/state.json";
+// 書き出したJSONファイルを参照する場合コメントアウトを外し、projectのstateに指定する
+// import projectState from "./assets/state.json";
 
 let increment,
   mouseX,
@@ -21,9 +21,9 @@ studio.initialize();
 const project = getProject("THREE.js x Theatre.js"); //ローカルストレージに保存されたアニメーションを参照
 // const project = getProject("THREE.js x Theatre.js", { state: projectState }); // エキスポートしたjsonからアニメーションを参照
 
-// シートを作成
-const sheet = project.sheet("Animated scene");
-const sheet2 = project.sheet("Cube animation");
+// アニメーションを保存するシートを作成
+const sheet = project.sheet("Opening animation"); // オープニングアニメーション用のシート
+const sheet2 = project.sheet("Cube animation"); // クリック時に再生するアニメーション用のシート
 
 // ロード後に一回再生
 // project.ready.then(() => sheet.sequence.play({ iterationCount: Infinity })); // ループ再生
@@ -52,7 +52,7 @@ const camera = new THREE.PerspectiveCamera(
   1000,
 );
 
-// メッシュ
+// アニメーションさせるメッシュ
 const geometry = new THREE.TorusKnotGeometry(16, 1, 300, 16, 2, 5);
 const material = new THREE.MeshStandardMaterial({
   color: "#ff9900",
@@ -72,7 +72,7 @@ meshBall.rotation.y = Math.PI * 0.1;
 /**
  *　Theatre.jsでアニメーションをさせるための定義
  *
- * シートid "Animated scene"
+ * シート "Opening animation"
  */
 const torusKnotObj = sheet.object("Torus Knot", {
   // GUIから入力ができるよう変更させる回転を定義
@@ -87,30 +87,24 @@ const torusKnotObj = sheet.object("Torus Knot", {
     sz: types.number(mesh.position.z, { range: [-10, 10] }),
   }),
 
-  cameraPos: types.compound({
-    cz: types.number(camera.position.z, { range: [-1, 180] }),
-  }),
+  cameraPos: types.number(camera.position.z, { range: [-1, 180] }),
 
-  ballPos: types.compound({
-    ballY: types.number(meshBall.position.y, { range: [-10, 10] }),
-  }),
+  ballPos: types.number(meshBall.position.y, { range: [-10, 10] }),
 });
 
 // GUIからの入力をオブジェクトに反映
 torusKnotObj.onValuesChange((values) => {
   const { x, y, z } = values.rotation;
   const { sx, sy, sz } = values.position;
-  const { cz } = values.cameraPos;
   mesh.rotation.set(x * Math.PI, y * Math.PI, z * Math.PI); // 度数ではなくラジアンなので変換
   mesh.position.set(sx, sy, sz);
-  camera.position.z = cz;
 
-  const { ballY } = values.ballPos;
-  meshBall.position.y = mouseY + ballY;
+  camera.position.z = values.cameraPos;
+  meshBall.position.y = mouseY + values.ballPos;
 });
 
 /**
- * シートid "Cube Animation" のアニメーション定義
+ * シート "Cube animation" のアニメーション定義
  */
 // キューブをシーンに追加
 const cubeSize = 7;
@@ -156,7 +150,7 @@ const textGeometry = new TextGeometry("Hello world!", {
 });
 textGeometry.center(); // テキストを中心揃え
 
-// そのままのTextGeometryだと表面がフラットでガタガタして見えるので、スムースシェーディングになるよう調整
+// そのままのTextGeometryだと表面がフラットなので、スムースシェーディングになるよう調整
 const textGeometry2 = textGeometry.clone().deleteAttribute("normal");
 const textGeometry3 = BufferGeometryUtils.mergeVertices(textGeometry2);
 textGeometry3.computeVertexNormals();
