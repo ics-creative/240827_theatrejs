@@ -4,20 +4,20 @@ import studio from "@theatre/studio";
 import { getProject, types } from "@theatre/core";
 
 // 書き出したJSONファイルを参照する場合コメントアウトを外し、projectのstateに指定する
-// import projectState from "./assets/state.json";
+import projectState from "./assets/SampleProject.theatre-project-state.json";
 
 // Theatre.jsのスタジオを初期化
 studio.initialize();
 
 // プロジェクトを取得
-const project = getProject("SampleProject"); // ローカルストレージに保存されたアニメーションを参照
-// const project = getProject("SampleProject", { state: projectState }); // エキスポートしたjsonからアニメーションを参照
+// const project = getProject("SampleProject"); // ローカルストレージに保存されたアニメーションを参照
+const project = getProject("SampleProject", { state: projectState }); // エキスポートしたjsonからアニメーションを参照
 
 // アニメーションを保存するシートを作成
 const sheet = project.sheet("Cube animation"); // クリック時に再生するアニメーション用のシート
 
 // ロード後に一回再生
-// project.ready.then(() => sheet.sequence.play({ iterationCount: Infinity })); // ループ再生
+project.ready.then(() => sheet.sequence.play({ iterationCount: Infinity })); // ループ再生
 
 
 /**
@@ -50,9 +50,15 @@ const cubeObj = sheet.object("Cube", {
   }),
   // 位置を定義
   position: types.compound({
-    sx: types.number(mesh.position.x, { range: [-100, 100] }),
-    sy: types.number(mesh.position.y, { range: [-100, 100] }),
-    sz: types.number(mesh.position.z, { range: [-100, 100] }),
+    px: types.number(mesh.position.x, { range: [-100, 100] }),
+    py: types.number(mesh.position.y, { range: [-100, 100] }),
+    pz: types.number(mesh.position.z, { range: [-100, 100] }),
+  }),
+  // スケール
+  scale: types.compound({
+    sx: types.number(mesh.scale.x, { range: [0, 4] }),
+    sy: types.number(mesh.scale.y, { range: [0, 4] }),
+    sz: types.number(mesh.scale.z, { range: [0, 4] }),
   }),
   // 色を定義
   color: types.rgba({ r: 255, g: 0, b: 0, a: 1 }),
@@ -64,8 +70,11 @@ cubeObj.onValuesChange((values) => {
   const { x, y, z } = values.rotation;
   mesh.rotation.set(x * Math.PI, y * Math.PI, z * Math.PI);
   // 位置を反映
-  const { sx, sy, sz } = values.position;
-  mesh.position.set(sx, sy, sz);
+  const { px, py, pz } = values.position;
+  mesh.position.set(px, py, pz);
+  // スケールを反映
+  const { sx, sy,sz } = values.scale;
+  mesh.scale.set(sx, sy, sz);
 
   // マテリアルの色を反映
   material.color = values.color;
@@ -92,6 +101,7 @@ const camera = new THREE.PerspectiveCamera(
   1,
   1000,
 );
+camera.position.z = 50;
 
 /** レンダラーを作成 */
 const renderer = new THREE.WebGLRenderer({ antialias: true });
