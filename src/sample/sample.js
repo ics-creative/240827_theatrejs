@@ -1,24 +1,23 @@
-import "./style.css";
+import "./../style.css";
 import * as THREE from "three";
 import studio from "@theatre/studio";
 import { getProject, types } from "@theatre/core";
 
 // 書き出したJSONファイルを参照する場合コメントアウトを外し、projectのstateに指定する
-import projectState from "./assets/SampleProject.theatre-project-state.json";
+// import projectState from "./../assets/SampleProject.theatre-project-state.json";
 
-// Theatre.jsのスタジオを初期化
+// Theatre.jsのスタジオを初期化（作業用UIを表示）
 studio.initialize();
 
-// プロジェクトを取得
-// const project = getProject("SampleProject"); // ローカルストレージに保存されたアニメーションを参照
-const project = getProject("SampleProject", { state: projectState }); // エキスポートしたjsonからアニメーションを参照
+// プロジェクトを初期化
+const project = getProject("SampleProject");
+// const project = getProject("SampleProject", { state: projectState }); // エキスポートしたjsonでアニメーションを初期化
 
 // アニメーションを保存するシートを作成
-const sheet = project.sheet("Cube animation"); // クリック時に再生するアニメーション用のシート
+const sheet = project.sheet("Cube animation");
 
 // ロード後に一回再生
 project.ready.then(() => sheet.sequence.play({ iterationCount: Infinity })); // ループ再生
-
 
 /**
  * Three.jsのセットアップ
@@ -28,8 +27,7 @@ const scene = new THREE.Scene();
 scene.background = new THREE.Color("#1d1d26");
 
 // アニメーションさせるキューブ型メッシュを用意
-const CUBE_SIZE = 7;
-const geometry = new THREE.BoxGeometry(CUBE_SIZE, CUBE_SIZE, CUBE_SIZE);
+const geometry = new THREE.BoxGeometry(7, 7, 7);
 const material = new THREE.MeshStandardMaterial({
   color: "#ff9900",
   emissive: "#049ef4",
@@ -43,7 +41,8 @@ scene.add(mesh); // three.jsのシーンに追加
 const cubeObj = sheet.object("Cube", {
   // GUIから入力できるよう、変更させたいプロパティを定義
   // 回転を定義
-  rotation: types.compound({ // types.compound() でグループ化
+  rotation: types.compound({
+    // types.compound() でグループ化
     x: types.number(mesh.rotation.x, { range: [-2, 2] }),
     y: types.number(mesh.rotation.y, { range: [-2, 2] }),
     z: types.number(mesh.rotation.z, { range: [-2, 2] }),
@@ -73,13 +72,12 @@ cubeObj.onValuesChange((values) => {
   const { px, py, pz } = values.position;
   mesh.position.set(px, py, pz);
   // スケールを反映
-  const { sx, sy,sz } = values.scale;
+  const { sx, sy, sz } = values.scale;
   mesh.scale.set(sx, sy, sz);
 
   // マテリアルの色を反映
   material.color = values.color;
 });
-
 
 /**
  * ライティング
@@ -97,7 +95,7 @@ scene.add(rectAreaLight);
 /** カメラを作成：THREE.PerspectiveCamera(視野角, アスペクト比, near, far) */
 const camera = new THREE.PerspectiveCamera(
   45,
-  document.body.clientWidth / window.innerHeight, // document.body.clientWidth：スクロールバーを抜いた幅
+  document.body.clientWidth / window.innerHeight, // document.body.clientWidth：スクロールバーを含まない横幅
   1,
   1000,
 );
@@ -110,7 +108,9 @@ renderer.render(scene, camera);
 const app = document.querySelector("#app");
 app.appendChild(renderer.domElement);
 
-// 毎フレーム時に実行されるループイベント
+/**
+ * 毎フレーム時に実行されるループイベント
+ */
 const tick = () => {
   // レンダリング
   renderer.render(scene, camera);

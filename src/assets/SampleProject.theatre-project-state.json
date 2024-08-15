@@ -402,8 +402,8 @@
                     "position": 5.667,
                     "connectedRight": true,
                     "handles": [
-                      0.575539696331049,
-                      0.5930089681330755,
+                      0.6333100688300236,
+                      0.4215302174523868,
                       0.4171848213955921,
                       0.6362714912724671
                     ],
@@ -615,7 +615,7 @@
                   },
                   {
                     "id": "XoQtdcKdTM",
-                    "position": 4.467,
+                    "position": 4.5,
                     "connectedRight": true,
                     "handles": [
                       0.5,
@@ -633,7 +633,7 @@
                   },
                   {
                     "id": "68XacIS0uV",
-                    "position": 4.5,
+                    "position": 4.533,
                     "connectedRight": true,
                     "handles": [
                       0.5,
@@ -827,6 +827,7 @@
   },
   "definitionVersion": "0.4.0",
   "revisionHistory": [
+    "pfU2eGxGxL9K_6Ki",
     "Gs6mmPkXjYJN29Uz"
   ]
 }
