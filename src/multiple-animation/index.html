@@ -5,30 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Theatre.js 作例</title>
 
+    <link rel="stylesheet" href="../style.css" />
     <script type="module" src="main.js"></script>
   </head>
 
   <body>
     <main>
-      <div class="kv">
-        <div id="app"></div>
-      </div>
+      <div id="app" class="kv"></div>
 
-      <a href="#section-about" id="scroll-button" class="scrollButton"
-        >Scroll↓</a
-      >
+      <a href="#section-about" id="scroll-button" class="scrollButton">
+        <span>Scroll</span>
+        <span>▼</span>
+      </a>
 
-      <section id="section-about" class="section">
-        <h2>About</h2>
-        <p>
-          Theatre.jsを用いたデモページです。<br />Three.jsとDOM要素をアニメーションさせています。
-        </p>
+      <section id="section-about" class="aboutSection">
+        <div class="aboutSection_inner">
+          <h2>About</h2>
+          <p>
+            Theatre.jsを用いたデモページです。<br />Three.jsとDOM要素をアニメーションさせています。
+          </p>
+        </div>
       </section>
     </main>
 
-    <footer class="footer">
-      <a href="/src/">目次へ</a>
-      <a href="/src/sample/">作例へ</a>
+    <footer class="navigation">
+      <a href="/src/">目次へもどる</a>
     </footer>
   </body>
 </html>

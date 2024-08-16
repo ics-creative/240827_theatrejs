@@ -1,4 +1,3 @@
-import "/src/style.css";
 import * as THREE from "three";
 import studio from "@theatre/studio";
 import { getProject, types } from "@theatre/core";
@@ -7,8 +6,9 @@ import { TextGeometry } from "three/addons/geometries/TextGeometry.js";
 import fontData from "@compai/font-fugaz-one/data/typefaces/normal-400.json"; // @see https://components.ai/docs/typefaces/packages
 import * as BufferGeometryUtils from "three/addons/utils/BufferGeometryUtils.js";
 
-// 書き出したJSONファイルを参照する場合コメントアウトを外し、projectのstateに指定する
-// import projectState from "../assets/state.json";
+// 書き出したJSONファイル（sampleディレクトリと同じアニメーションをコピーしたいので、一旦読み込ませる）
+// import projectState from "../assets/SampleProject.theatre-project-state.json";
+import projectState from "../assets/MultipleAnimationProject.theatre-project-state.json";
 
 // Theatre.jsのスタジオを初期化（開発環境でのみUIを表示）
 if (import.meta.env.DEV) {
@@ -16,37 +16,51 @@ if (import.meta.env.DEV) {
 }
 
 // プロジェクトを取得
-const project = getProject("MultipleAnimationProject");
-// const project = getProject("MultipleAnimationProject", { state: projectState }); // エキスポートしたjsonからアニメーションを参照
+// const project = getProject("MultipleAnimationProject");
+const project = getProject("MultipleAnimationProject", { state: projectState }); // エキスポートしたjsonからアニメーションを参照
 
 // アニメーションを保存するシートを作成
 const kvSheet = project.sheet("KV Animation"); // ロード後自動で再生するアニメーション用のシート
-const scrollButtonSheet = project.sheet("Scroll Animation"); // スクロールボタン押下時に再生するアニメーション用のシート
+const scrollAnimSheet = project.sheet("Scroll Animation"); // スクロールボタン押下時に再生するアニメーション用のシート
+const scrollButtonSheet = project.sheet("Scroll Button Animation"); // スクロールボタンのアニメーション用のシート
+const textLoopSheet = project.sheet("Text Loop Animation"); // テキストのループアニメーション用のシート
 
-// プロジェクトの読み込み後に1回自動で再生
-project.ready.then(() => kvSheet.sequence.play());
+(async () => {
+  // Theatre.jsのロードを待つ
+  await project.ready;
+
+  // ロード後、1度だけ再生
+  kvSheet.sequence.play();
+
+  // KVアニメーション後、ループアニメーションを開始
+  textLoopSheet.sequence.play({
+    iterationCount: Infinity, // 無限ループ
+    direction: "alternateReverse", // 通常再生-逆再生を往復
+    rate: 0.8, // 0.8倍速
+  });
+})();
 
 // スクロールボタン押下で再生
 const scrollButton = document.querySelector("#scroll-button");
 scrollButton.addEventListener("click", () => {
-  scrollButtonSheet.sequence.play();
+  scrollAnimSheet.sequence.play();
 });
 
-// スクロールでも再生
+// スクロールでも再生（IntersectionObserverを使用）
 const section = document.querySelector("#section-about"); // 交差の監視対象
 const observer = new IntersectionObserver(
   (entries) => {
-    // プロジェクトが読み込まれていなければリターン
+    // Theatre.jsが読み込まれていなければリターン
     if (!project.isReady) {
       return;
     }
     if (entries[0].isIntersecting) {
-      // 交差したときにscrollButtonSheetを再生
+      // スクロールして交差したときにアニメーションを再生
+      scrollAnimSheet.sequence.play();
       scrollButtonSheet.sequence.play();
-
-      // 交差したときにscrollButtonSheetを再生
     } else {
-      // 戻るときは逆再生
+      // 上に戻るときは逆再生
+      scrollAnimSheet.sequence.play({ direction: "reverse" });
       scrollButtonSheet.sequence.play({ direction: "reverse" });
     }
   },
@@ -74,7 +88,7 @@ const camera = new THREE.PerspectiveCamera(
   1,
   1000,
 );
-camera.position.z = 100;
+camera.position.z = 50;
 
 const material = new THREE.MeshStandardMaterial({
   color: "#ff9900",
@@ -88,12 +102,12 @@ const material = new THREE.MeshStandardMaterial({
 const font = new FontLoader().parse(fontData);
 const textGeometry = new TextGeometry("Hello!", {
   font: font,
-  size: 30,
+  size: 15,
   depth: 3,
   curveSegments: 12,
   bevelEnabled: true,
-  bevelThickness: 2,
-  bevelSize: 1.8, // 数値が大きいほど膨張した感じになる
+  bevelThickness: 1,
+  bevelSize: 0.9, // 数値が大きいほど膨張した感じになる
   bevelOffset: 0,
   bevelSegments: 5,
 });
@@ -108,69 +122,150 @@ textGeometry3.computeVertexNormals();
 const text = new THREE.Mesh(textGeometry3, material);
 scene.add(text); // シーンに追加
 
+const cubeMaterial = new THREE.MeshStandardMaterial({
+  color: "#ff9900",
+  emissive: "#049ef4",
+});
+const boxGeometry = new THREE.BoxGeometry(7, 7, 7);
+const cube = new THREE.Mesh(boxGeometry, cubeMaterial);
+scene.add(cube); // three.jsのシーンに追加
+
 /**
- * シート "KV Animation" のアニメーション定義
+ * シート "Cube animation" のアニメーション定義
+ */
+const cubeObj = kvSheet.object("Cube", {
+  // GUIから入力できるよう、変更させたいプロパティを定義
+  // 回転を定義
+  rotation: types.compound({
+    // types.compound() でグループ化
+    x: types.number(cube.rotation.x, { range: [-2, 2] }),
+    y: types.number(cube.rotation.y, { range: [-2, 2] }),
+    z: types.number(cube.rotation.z, { range: [-2, 2] }),
+  }),
+  // 位置を定義
+  position: types.compound({
+    px: types.number(cube.position.x, { range: [-100, 100] }),
+    py: types.number(cube.position.y, { range: [-100, 100] }),
+    pz: types.number(cube.position.z, { range: [-100, 100] }),
+  }),
+  // スケール
+  scale: types.compound({
+    sx: types.number(cube.scale.x, { range: [0, 4] }),
+    sy: types.number(cube.scale.y, { range: [0, 4] }),
+    sz: types.number(cube.scale.z, { range: [0, 4] }),
+  }),
+  // 色を定義
+  color: types.rgba({ r: 255, g: 0, b: 0, a: 1 }),
+});
+
+// GUIからの入力をオブジェクトに反映
+cubeObj.onValuesChange((values) => {
+  // 回転を反映
+  const { x, y, z } = values.rotation;
+  cube.rotation.set(x * Math.PI, y * Math.PI, z * Math.PI);
+  // 位置を反映
+  const { px, py, pz } = values.position;
+  cube.position.set(px, py, pz);
+  // スケールを反映
+  const { sx, sy, sz } = values.scale;
+  cube.scale.set(sx, sy, sz);
+
+  // マテリアルの色を反映
+  cubeMaterial.color = values.color;
+});
+
+/**
+ * シート "KV Animation" の定義
  */
 const textObjProps = {
   // GUIから入力ができるよう変更させる回転を定義
   rotation: types.compound({
-    x: types.number(text.rotation.x, { range: [-2, 2] }), // −360 〜 360度 の想定
-    y: types.number(text.rotation.y, { range: [-2, 2] }),
-    z: types.number(text.rotation.z, { range: [-2, 2] }),
+    x: types.number(0, { range: [-2, 2] }), // −360 〜 360度 の想定
+    y: types.number(0, { range: [-2, 2] }),
+    z: types.number(0, { range: [-2, 2] }),
   }),
   position: types.compound({
-    px: types.number(text.position.x, { range: [-100, 100] }),
-    py: types.number(text.position.y, { range: [-100, 100] }),
-    pz: types.number(text.position.z, { range: [-100, 100] }),
+    px: types.number(0, { range: [-100, 100] }),
+    py: types.number(0, { range: [-100, 100] }),
+    pz: types.number(0, { range: [-100, 100] }),
   }),
 };
 
-const textObj = kvSheet.object("TextObject", textObjProps);
+const textObj = kvSheet.object("Text", textObjProps);
 
-// GUIからの入力をオブジェクトに反映
-textObj.onValuesChange((values) => {
+const callbackFunc = (values) => {
   const { x, y, z } = values.rotation;
   const { px, py, pz } = values.position;
   text.rotation.set(x * Math.PI, y * Math.PI, z * Math.PI);
   text.position.set(px, py, pz);
+};
+
+// GUIからの入力をオブジェクトに反映
+textObj.onValuesChange(callbackFunc);
+
+// GUIから入力するためのプロパティを定義
+const scrollButtonO = kvSheet.object("ScrollButton", {
+  opacity: types.number(1, { range: [0, 1] }),
+  visibility: types.stringLiteral("visible", {
+    visible: "visible",
+    hidden: "hidden",
+  }),
+  // スケール
+  scale: types.compound({
+    x: types.number(1, { range: [0, 2] }),
+    y: types.number(1, { range: [0, 2] }),
+  }),
+});
+
+// GUIからの入力を反映
+scrollButtonO.onValuesChange((values) => {
+  scrollButton.style.opacity = values.opacity;
+  scrollButton.style.visibility = values.visibility;
+  scrollButton.style.scale = `${values.scale.x} ${values.scale.y}`;
 });
 
 /**
- *　シート "Scroll Animation" のアニメーション定義
+ *　シート "Scroll Animation" の定義
  */
-const geometry = new THREE.BoxGeometry(2, 2, 2);
-const emptyObject = new THREE.Mesh(geometry, material);
-scene.add(emptyObject); // three.jsのシーンに追加
+const textObj2 = scrollAnimSheet.object("Text", textObjProps);
+textObj2.onValuesChange(callbackFunc);
 
-const cameraObj = scrollButtonSheet.object("CameraObject", {
-  position: types.compound({
-    x: types.number(emptyObject.position.x, { range: [-100, 100] }),
-    y: types.number(emptyObject.position.y, { range: [-10, 10] }),
-    z: types.number(emptyObject.position.z, { range: [-10, 10] }),
+/**
+ * シート "Scroll Button Animation" の定義
+ */
+// GUIから入力するためのプロパティを定義
+const scrollButtonObj = scrollButtonSheet.object("ScrollButton", {
+  opacity: types.number(1, { range: [0, 1] }),
+  visibility: types.stringLiteral("visible", {
+    visible: "visible",
+    hidden: "hidden",
   }),
-  cameraPos: types.number(camera.position.z, { range: [-1, 180] }),
-});
-cameraObj.onValuesChange((values) => {
-  const { x, y, z } = values.position;
-  emptyObject.position.set(x, y, z);
-  camera.position.z = values.cameraPos;
 });
 
-const textObj2 = scrollButtonSheet.object("TextObject", textObjProps);
-textObj2.onValuesChange((values) => {
-  const { x, y, z } = values.rotation;
-  const { px, py, pz } = values.position;
-  text.rotation.set(x * Math.PI, y * Math.PI, z * Math.PI);
-  text.position.set(px, py, pz);
+// GUIからの入力を反映
+scrollButtonObj.onValuesChange((values) => {
+  scrollButton.style.opacity = values.opacity;
+  scrollButton.style.visibility = values.visibility;
+});
+
+/**
+ * シート "Text Loop Animation" の定義
+ */
+const textLoopObj = textLoopSheet.object("TextLoop", {
+  posY: types.number(0, { range: [-10, 10] }),
+});
+textLoopObj.onValuesChange((value) => {
+  text.position.y = value.posY;
 });
 
 /**
  * 地面
  */
-const cylinderGeometry = new THREE.CylinderGeometry(30, 32, 7, 48);
-const cylinder = new THREE.Mesh(cylinderGeometry, material);
-cylinder.position.y = -30;
-scene.add(cylinder);
+// const cylinderGeometry = new THREE.CylinderGeometry(20, 21, 4, 56);
+// const cylinder = new THREE.Mesh(cylinderGeometry, material);
+// cylinder.position.y = -20;
+// cylinder.position.z = -20;
+// scene.add(cylinder);
 
 /**
  * ライティング
@@ -202,7 +297,7 @@ const tick = () => {
   renderer.render(scene, camera);
 
   // カメラはemptyObjectの方向を見るように
-  camera.lookAt(emptyObject.position);
+  // camera.lookAt(cube.position);
 
   window.requestAnimationFrame(tick);
 };

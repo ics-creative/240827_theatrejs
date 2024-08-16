@@ -1,22 +1,21 @@
-import "./../style.css";
 import * as THREE from "three";
 import studio from "@theatre/studio";
 import { getProject, types } from "@theatre/core";
 
-// 書き出したJSONファイルを参照する場合コメントアウトを外し、projectのstateに指定する
-// import projectState from "./../assets/SampleProject.theatre-project-state.json";
+// 書き出したJSONファイル
+import projectState from "../assets/SampleProject.theatre-project-state.json";
 
 // Theatre.jsのスタジオを初期化（作業用UIを表示）
 studio.initialize();
 
 // プロジェクトを初期化
-const project = getProject("SampleProject");
-// const project = getProject("SampleProject", { state: projectState }); // エキスポートしたjsonでアニメーションを初期化
+// const project = getProject("SampleProject"); // 初回でJSONファイルがない場合はこちら
+const project = getProject("SampleProject", { state: projectState }); // 書き出したJSONファイルを参照しアニメーションを初期化
 
 // アニメーションを保存するシートを作成
-const sheet = project.sheet("Cube animation");
+const sheet = project.sheet("KV Animation");
 
-// ロード後に一回再生
+// Theatre.jsのロード後に自動で再生
 project.ready.then(() => sheet.sequence.play({ iterationCount: Infinity })); // ループ再生
 
 /**
