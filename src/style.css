@@ -18,13 +18,13 @@ html {
 
 .scrollButton {
   position: absolute;
-  right: 100px;
-  bottom: 50px;
+  bottom: 30px;
+  left: 50%;
   display: grid;
   place-content: center;
   place-items: center;
-  width: 96px;
-  height: 96px;
+  width: 86px;
+  height: 86px;
   font-size: 18px;
   color: #fff;
   text-decoration: none;
@@ -32,7 +32,7 @@ html {
   -webkit-backdrop-filter: blur(4px);
   backdrop-filter: blur(4px);
   border-radius: 18px;
-  transform: translateY(-50%); /* アニメーションの原点を下辺基準になるようずらす */
+  transform: translate(-50%, -50%); /* アニメーションの原点を下辺基準になるようずらす */
 
   /* グラデーションの枠線: https://koji-website.com/circle_gradient_border/#index_id2 */
   &::before {
@@ -53,14 +53,18 @@ html {
 }
 
 .aboutSection {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   max-width: 600px;
   height: 100vh;
-  padding: 180px 16px 0;
+  padding: 0 16px;
   margin: 0 auto;
   color: #fff;
   text-align: center;
 
   .aboutSection_inner {
+    width: 100%;
     padding: 100px 32px;
     background-color: rgb(255 255 255 / 40%);
     -webkit-backdrop-filter: blur(4px);
@@ -69,9 +73,10 @@ html {
     border-radius: 18px;
   }
 
-  h2 {
+  .aboutSection_title {
     margin-bottom: 60px;
     font-size: 32px;
+    font-weight: 700;
     color: #ffdaf0;
   }
 
