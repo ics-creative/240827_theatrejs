@@ -1,14 +1,18 @@
 import { resolve } from "path";
 import { defineConfig } from "vite";
 
+const root = resolve(__dirname, "src");
+const outDir = resolve(__dirname, "dist");
+
 export default defineConfig({
+  root,
   build: {
-    outDir: "../dist",
+    outDir,
     rollupOptions: {
       input: {
-        main: resolve(__dirname, "index.html"),
-        sample: resolve(__dirname, "src/sample/index.html"),
-        multiple: resolve(__dirname, "src/multiple-animation/index.html"),
+        main: resolve(root, "index.html"),
+        sample: resolve(root, "sample", "index.html"),
+        multiple: resolve(root, "multiple-animation", "index.html"),
       },
     },
     base: "/240827_theatrejs/",
