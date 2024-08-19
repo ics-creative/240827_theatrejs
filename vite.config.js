@@ -10,5 +10,6 @@ export default defineConfig({
         multiple: resolve(__dirname, "src/multiple-animation/index.html"),
       },
     },
+    base: "/240827_theatrejs/"
   },
 });
