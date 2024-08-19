@@ -3,7 +3,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "fix": "stylelint \"**/*.css\" --fix",
+    "fix": "stylelint \"src/*.css\" --fix",
     "format": "prettier --write \"**/*.{html,js}\""
   },
   "license": "MIT",
