@@ -6,7 +6,8 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: resolve(__dirname, "index.html"),
-        nested: resolve(__dirname, "src/sample/index.html"),
+        sample: resolve(__dirname, "src/sample/index.html"),
+        multiple: resolve(__dirname, "src/multiple-animation/index.html"),
       },
     },
   },
