@@ -1,4 +1,4 @@
-# 240730_theatrejs
+# 240827_theatrejs
 
 ICS MEDIAの記事『』のサンプルコードです。
 
