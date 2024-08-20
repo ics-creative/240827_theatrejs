@@ -8,6 +8,7 @@ html {
   width: 100%;
   height: 100%;
   overflow-x: hidden;
+  background-color: #626269;
 }
 
 .kv {
@@ -90,7 +91,6 @@ html {
   flex-direction: column;
   padding: 32px;
   color: #ffdaf0;
-  background-color: #626269;
   border-top: solid 3px;
   border-image: linear-gradient(-45deg, #ffdaf0, #fff5db) 1;
 
