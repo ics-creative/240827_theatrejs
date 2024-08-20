@@ -78,7 +78,7 @@ const observer = new IntersectionObserver(
 // スクロールボタンのアニメーション定義
 // ---------------------------
 /** シート"KV Animation"の定義 */
-const scrollButtonO = kvSheet.object("ScrollButton", {
+const kvScrollButtonObj = kvSheet.object("ScrollButton", {
   visibility: types.stringLiteral("visible", {
     visible: "visible",
     hidden: "hidden",
@@ -88,7 +88,7 @@ const scrollButtonO = kvSheet.object("ScrollButton", {
     y: types.number(1, { range: [0, 2] }),
   }),
 });
-scrollButtonO.onValuesChange((values) => {
+kvScrollButtonObj.onValuesChange((values) => {
   scrollButton.style.visibility = values.visibility;
   scrollButton.style.scale = `${values.scale.x} ${values.scale.y}`;
 });
@@ -112,15 +112,6 @@ scrollButtonObj.onValuesChange((values) => {
 // シーンを作成
 const scene = new THREE.Scene();
 scene.background = new THREE.Color("#1d1d26");
-
-// カメラを作成：THREE.PerspectiveCamera(視野角, アスペクト比, near, far)
-const camera = new THREE.PerspectiveCamera(
-  45,
-  document.body.clientWidth / window.innerHeight, // document.body.clientWidth：スクロールバーを幅含まない横幅
-  1,
-  1000,
-);
-camera.position.z = 45;
 
 // ---------------------------
 // テキストのアニメーション定義
@@ -194,12 +185,13 @@ textLoopObj.onValuesChange((value) => {
 // ---------------------------
 // キューブのアニメーション定義
 // ---------------------------
-const cubeMaterial = new THREE.MeshStandardMaterial({
+// キューブのメッシュ
+const material = new THREE.MeshStandardMaterial({
   color: "#ff9900",
   emissive: "#049ef4",
 });
-const boxGeometry = new THREE.BoxGeometry(6, 6, 6);
-const cube = new THREE.Mesh(boxGeometry, cubeMaterial);
+const geometry = new THREE.BoxGeometry(6, 6, 6);
+const cube = new THREE.Mesh(geometry, material);
 scene.add(cube); // three.jsのシーンに追加
 
 /** シート"KV Animation"の定義 */
@@ -231,7 +223,7 @@ cubeObj.onValuesChange((values) => {
   cube.position.set(px, py, pz);
   const { sx, sy, sz } = values.scale;
   cube.scale.set(sx, sy, sz);
-  cubeMaterial.color = values.color;
+  material.color = values.color;
 });
 
 /**
@@ -248,6 +240,17 @@ rectAreaLight.lookAt(new THREE.Vector3(0, 0, 0)); // 座標原点の方を照ら
 scene.add(rectAreaLight);
 
 /**
+ * カメラ
+ */
+const camera = new THREE.PerspectiveCamera(
+  45,
+  document.body.clientWidth / window.innerHeight, // document.body.clientWidth：スクロールバーを幅含まない横幅
+  1,
+  1000,
+);
+camera.position.z = 45;
+
+/**
  * レンダラー
  */
 const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -262,9 +265,6 @@ app.appendChild(renderer.domElement);
 const tick = () => {
   // レンダリング
   renderer.render(scene, camera);
-
-  // カメラはemptyObjectの方向を見るように
-  // camera.lookAt(cube.position);
 
   window.requestAnimationFrame(tick);
 };

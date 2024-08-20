@@ -35,28 +35,28 @@ const mesh = new THREE.Mesh(geometry, material);
 scene.add(mesh); // three.jsのシーンに追加
 
 /**
- * シート "Cube animation" のアニメーション定義
+ * シート "KV Animation" のアニメーション定義
  */
 const cubeObj = sheet.object("Cube", {
   // GUIから入力できるよう、変更させたいプロパティを定義
   // 回転を定義
   rotation: types.compound({
     // types.compound() でグループ化
-    x: types.number(mesh.rotation.x, { range: [-2, 2] }),
-    y: types.number(mesh.rotation.y, { range: [-2, 2] }),
-    z: types.number(mesh.rotation.z, { range: [-2, 2] }),
+    x: types.number(0, { range: [-2, 2] }), // −360 〜 360度 の想定
+    y: types.number(0, { range: [-2, 2] }),
+    z: types.number(0, { range: [-2, 2] }),
   }),
   // 位置を定義
   position: types.compound({
-    px: types.number(mesh.position.x, { range: [-100, 100] }),
-    py: types.number(mesh.position.y, { range: [-100, 100] }),
-    pz: types.number(mesh.position.z, { range: [-100, 100] }),
+    px: types.number(0, { range: [-100, 100] }),
+    py: types.number(0, { range: [-100, 100] }),
+    pz: types.number(0, { range: [-100, 100] }),
   }),
   // スケール
   scale: types.compound({
-    sx: types.number(mesh.scale.x, { range: [0, 4] }),
-    sy: types.number(mesh.scale.y, { range: [0, 4] }),
-    sz: types.number(mesh.scale.z, { range: [0, 4] }),
+    sx: types.number(0, { range: [0, 4] }),
+    sy: types.number(0, { range: [0, 4] }),
+    sz: types.number(0, { range: [0, 4] }),
   }),
   // 色を定義
   color: types.rgba({ r: 255, g: 0, b: 0, a: 1 }),
@@ -66,7 +66,7 @@ const cubeObj = sheet.object("Cube", {
 cubeObj.onValuesChange((values) => {
   // 回転を反映
   const { x, y, z } = values.rotation;
-  mesh.rotation.set(x * Math.PI, y * Math.PI, z * Math.PI);
+  mesh.rotation.set(x * Math.PI, y * Math.PI, z * Math.PI); // three.jsの回転は度数法ではなくラジアンなので変換しておく
   // 位置を反映
   const { px, py, pz } = values.position;
   mesh.position.set(px, py, pz);
@@ -91,7 +91,9 @@ rectAreaLight.position.set(-20, 40, 10);
 rectAreaLight.lookAt(new THREE.Vector3(0, 0, 0)); // 座標原点の方を照らす
 scene.add(rectAreaLight);
 
-/** カメラを作成：THREE.PerspectiveCamera(視野角, アスペクト比, near, far) */
+/**
+ * カメラ
+ */
 const camera = new THREE.PerspectiveCamera(
   45,
   document.body.clientWidth / window.innerHeight, // document.body.clientWidth：スクロールバーを含まない横幅
@@ -100,7 +102,9 @@ const camera = new THREE.PerspectiveCamera(
 );
 camera.position.z = 50;
 
-/** レンダラーを作成 */
+/**
+ * レンダラー
+ */
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.render(scene, camera);
 
