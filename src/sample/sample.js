@@ -13,7 +13,7 @@ studio.initialize();
 const project = getProject("SampleProject", { state: projectState }); // 書き出したJSONファイルを参照しアニメーションを初期化
 
 // アニメーションを保存するシートを作成
-const sheet = project.sheet("KV Animation");
+const sheet = project.sheet("Cube animation");
 
 // Theatre.jsのロード後に自動で再生
 project.ready.then(() => sheet.sequence.play({ iterationCount: Infinity })); // ループ再生
@@ -35,7 +35,7 @@ const mesh = new THREE.Mesh(geometry, material);
 scene.add(mesh); // three.jsのシーンに追加
 
 /**
- * シート "KV Animation" のアニメーション定義
+ * シート "Cube animation" のアニメーション定義
  */
 const cubeObj = sheet.object("Cube", {
   // GUIから入力できるよう、変更させたいプロパティを定義
@@ -85,7 +85,7 @@ cubeObj.onValuesChange((values) => {
 const ambientLight = new THREE.AmbientLight("#ffffff", 1);
 scene.add(ambientLight);
 
-// RectAreaLight
+// 矩形ライト
 const rectAreaLight = new THREE.RectAreaLight("#ff0", 10, 50, 50);
 rectAreaLight.position.set(-20, 40, 10);
 rectAreaLight.lookAt(new THREE.Vector3(0, 0, 0)); // 座標原点の方を照らす

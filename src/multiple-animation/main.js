@@ -79,28 +79,34 @@ const observer = new IntersectionObserver(
 // ---------------------------
 /** シート"KV Animation"の定義 */
 const kvScrollButtonObj = kvSheet.object("ScrollButton", {
-  visibility: types.stringLiteral("visible", {
-    visible: "visible",
-    hidden: "hidden",
-  }),
   scale: types.compound({
     x: types.number(1, { range: [0, 2] }),
     y: types.number(1, { range: [0, 2] }),
   }),
-});
-kvScrollButtonObj.onValuesChange((values) => {
-  scrollButton.style.visibility = values.visibility;
-  scrollButton.style.scale = `${values.scale.x} ${values.scale.y}`;
-});
-
-/** シート"Scroll Button Animation"の定義 */
-const scrollButtonObj = scrollButtonSheet.object("ScrollButton", {
-  opacity: types.number(1, { range: [0, 1] }),
+  // 見えないときは押下不可にするため、visibilityを定義
   visibility: types.stringLiteral("visible", {
     visible: "visible",
     hidden: "hidden",
   }),
 });
+kvScrollButtonObj.onValuesChange((values) => {
+  scrollButton.style.scale = `${values.scale.x} ${values.scale.y}`;
+  scrollButton.style.visibility = values.visibility;
+});
+
+/** シート"Scroll Button Animation"の定義 */
+// GUIから入力するためのプロパティを定義
+const scrollButtonObj = scrollButtonSheet.object("ScrollButton", {
+  // 不透明度
+  opacity: types.number(1, { range: [0, 1] }),
+  // 透明度0のときに押下不可にするため、visibilityも定義
+  visibility: types.stringLiteral("visible", {
+    visible: "visible",
+    hidden: "hidden",
+  }),
+});
+
+// GUIからの入力を反映
 scrollButtonObj.onValuesChange((values) => {
   scrollButton.style.opacity = values.opacity;
   scrollButton.style.visibility = values.visibility;
@@ -233,7 +239,7 @@ cubeObj.onValuesChange((values) => {
 const ambientLight = new THREE.AmbientLight("#ffffff", 1);
 scene.add(ambientLight);
 
-// RectAreaLight
+// 矩形ライト
 const rectAreaLight = new THREE.RectAreaLight("#ff0", 10, 50, 50);
 rectAreaLight.position.set(-20, 40, 10);
 rectAreaLight.lookAt(new THREE.Vector3(0, 0, 0)); // 座標原点の方を照らす
