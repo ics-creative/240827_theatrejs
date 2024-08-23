@@ -4,7 +4,7 @@ import { getProject, types } from "@theatre/core";
 import { createTextMesh } from "./createTextMesh";
 import projectState from "../assets/MultipleAnimationProject.theatre-project-state.json";
 
-// Theatre.jsのスタジオを初期化（開発環境でのみUIを表示）
+// Theatre.jsのスタジオを初期化（開発環境でのみGUIを表示）
 if (import.meta.env.DEV) {
   studio.initialize();
 }
@@ -13,7 +13,7 @@ if (import.meta.env.DEV) {
 const project = getProject("MultipleAnimationProject", { state: projectState }); // 書き出したJSONファイルを参照しアニメーションを初期化
 
 // アニメーションを保存するシートを作成
-const kvSheet = project.sheet("KV Animation"); // ロード後自動で再生するアニメーション用のシート
+const kvSheet = project.sheet("KV Animation"); // ロード後自動で再生するキービジュアルアニメーション用のシート
 const scrollAnimSheet = project.sheet("Scroll Animation"); // スクロールボタン押下時に再生するアニメーション用のシート
 const scrollButtonSheet = project.sheet("Scroll Button Animation"); // スクロールボタンのアニメーション用のシート
 const textLoopSheet = project.sheet("Text Loop Animation"); // テキストのループアニメーション用のシート
@@ -25,7 +25,7 @@ const textLoopSheet = project.sheet("Text Loop Animation"); // テキストの�
   // ロード後、1度だけ再生
   await kvSheet.sequence.play();
 
-  // KVアニメーション後、ループアニメーションを開始
+  // キービジュアルアニメーション後、ループアニメーションを開始
   textLoopSheet.sequence.play({
     iterationCount: Infinity, // 無限ループ
     direction: "alternate", // 通常再生-逆再生を往復
@@ -198,7 +198,7 @@ const material = new THREE.MeshStandardMaterial({
 });
 const geometry = new THREE.BoxGeometry(6, 6, 6);
 const cube = new THREE.Mesh(geometry, material);
-scene.add(cube); // three.jsのシーンに追加
+scene.add(cube); // Three.jsのシーンに追加
 
 /** シート"KV Animation"の定義 */
 // GUIから入力できるよう、変更させたいプロパティを定義

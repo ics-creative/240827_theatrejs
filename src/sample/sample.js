@@ -5,7 +5,7 @@ import { getProject, types } from "@theatre/core";
 // 書き出したJSONファイル
 import projectState from "../assets/SampleProject.theatre-project-state.json";
 
-// Theatre.jsのスタジオを初期化（作業用UIを表示）
+// Theatre.jsのスタジオを初期化（作業用GUIを表示）
 studio.initialize();
 
 // プロジェクトを初期化
@@ -32,18 +32,18 @@ const material = new THREE.MeshStandardMaterial({
   emissive: "#049ef4",
 });
 const mesh = new THREE.Mesh(geometry, material);
-scene.add(mesh); // three.jsのシーンに追加
+scene.add(mesh); // Three.jsのシーンに追加
 
 /**
- * シート "Cube animation" のアニメーション定義
+ * シート "Cube animation" の定義
  */
 const cubeObj = sheet.object("Cube", {
   // GUIから入力できるよう、変更させたいプロパティを定義
   // 回転を定義
   rotation: types.compound({
     // types.compound() でグループ化
-    x: types.number(0, { range: [-2, 2] }), // −360 〜 360度 の想定
-    y: types.number(0, { range: [-2, 2] }),
+    x: types.number(0, { range: [-2, 2] }), // types.number(初期値, { range: [最小値, 最大値] })
+    y: types.number(0, { range: [-2, 2] }), // −360 〜 360度 の想定
     z: types.number(0, { range: [-2, 2] }),
   }),
   // 位置を定義
@@ -62,11 +62,11 @@ const cubeObj = sheet.object("Cube", {
   color: types.rgba({ r: 255, g: 0, b: 0, a: 1 }),
 });
 
-// GUIからの入力をオブジェクトに反映
+// GUIからの入力をメッシュやマテリアルに反映
 cubeObj.onValuesChange((values) => {
   // 回転を反映
   const { x, y, z } = values.rotation;
-  mesh.rotation.set(x * Math.PI, y * Math.PI, z * Math.PI); // three.jsの回転は度数法ではなくラジアンなので変換しておく
+  mesh.rotation.set(x * Math.PI, y * Math.PI, z * Math.PI); // Three.jsの回転は度数法ではなくラジアンなので変換しておく
   // 位置を反映
   const { px, py, pz } = values.position;
   mesh.position.set(px, py, pz);
