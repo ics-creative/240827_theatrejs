@@ -87,19 +87,6 @@
                     ],
                     "type": "bezier",
                     "value": 0
-                  },
-                  {
-                    "id": "pexKV_qg-n",
-                    "position": 2,
-                    "connectedRight": true,
-                    "handles": [
-                      0.5,
-                      1,
-                      0.5,
-                      0
-                    ],
-                    "type": "bezier",
-                    "value": 0
                   }
                 ]
               },
@@ -202,7 +189,7 @@
                       0
                     ],
                     "type": "bezier",
-                    "value": -0.15190624536418929
+                    "value": -0.076
                   }
                 ]
               },
@@ -234,7 +221,7 @@
                       0
                     ],
                     "type": "bezier",
-                    "value": -0.27848101265822783
+                    "value": -0.139
                   },
                   {
                     "id": "BFVtLG3d0n",
@@ -247,7 +234,7 @@
                       -0.04132395382395382
                     ],
                     "type": "bezier",
-                    "value": -0.27848101265822783
+                    "value": -0.139
                   },
                   {
                     "id": "EAhPMZoH5q",
@@ -260,7 +247,7 @@
                       0
                     ],
                     "type": "bezier",
-                    "value": -0.5
+                    "value": -0.25
                   }
                 ]
               },
@@ -827,6 +814,7 @@
   },
   "definitionVersion": "0.4.0",
   "revisionHistory": [
+    "Lnr7PbHlj-6lSS-u",
     "pfU2eGxGxL9K_6Ki",
     "Gs6mmPkXjYJN29Uz"
   ]

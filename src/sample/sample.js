@@ -42,9 +42,9 @@ const cubeObj = sheet.object("Cube", {
   // 回転を定義
   rotation: types.compound({
     // types.compound() でグループ化
-    x: types.number(0, { range: [-2, 2] }), // types.number(初期値, { range: [最小値, 最大値] })
-    y: types.number(0, { range: [-2, 2] }), // −360 〜 360度 の想定
-    z: types.number(0, { range: [-2, 2] }),
+    x: types.number(0, { range: [-1, 1] }), // types.number(初期値, { range: [最小値, 最大値] })
+    y: types.number(0, { range: [-1, 1] }), // −1回転 〜 １回転 の想定
+    z: types.number(0, { range: [-1, 1] }),
   }),
   // 位置を定義
   position: types.compound({
@@ -66,7 +66,7 @@ const cubeObj = sheet.object("Cube", {
 cubeObj.onValuesChange((values) => {
   // 回転を反映
   const { x, y, z } = values.rotation;
-  mesh.rotation.set(x * Math.PI, y * Math.PI, z * Math.PI); // Three.jsの回転は度数法ではなくラジアンなので変換しておく
+  mesh.rotation.set(x * 2 * Math.PI, y * 2 * Math.PI, z * 2 * Math.PI); // 回転度合いが反映されるよう変換（Three.jsは度数法ではなくラジアン）
   // 位置を反映
   const { px, py, pz } = values.position;
   mesh.position.set(px, py, pz);
