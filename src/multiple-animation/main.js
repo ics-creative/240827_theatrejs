@@ -136,9 +136,9 @@ scene.add(textGroup);
 // GUIから入力ができるよう変更させる回転を定義
 const textObjProps = {
   rotation: types.compound({
-    x: types.number(0, { range: [-2, 2] }), // −360 〜 360度 の想定
-    y: types.number(0, { range: [-2, 2] }),
-    z: types.number(0, { range: [-2, 2] }),
+    x: types.number(0, { range: [-1, 1] }), // −1回転 〜 1回転 の想定
+    y: types.number(0, { range: [-1, 1] }),
+    z: types.number(0, { range: [-1, 1] }),
   }),
   position: types.compound({
     px: types.number(0, { range: [-100, 100] }),
@@ -175,7 +175,7 @@ text2Obj.onValuesChange((values) => {
 const textGroupObj = scrollAnimSheet.object("TextGroup", textObjProps);
 textGroupObj.onValuesChange((values) => {
   const { x, y, z } = values.rotation;
-  textGroup.rotation.set(x * Math.PI, y * Math.PI, z * Math.PI);
+  textGroup.rotation.set(x * 2 * Math.PI, y * 2 * Math.PI, z * 2 * Math.PI);
   const { px, py, pz } = values.position;
   textGroup.position.set(px, py, pz);
 });
@@ -204,9 +204,9 @@ scene.add(cube); // Three.jsのシーンに追加
 // GUIから入力できるよう、変更させたいプロパティを定義
 const cubeObj = kvSheet.object("Cube", {
   rotation: types.compound({
-    x: types.number(cube.rotation.x, { range: [-2, 2] }),
-    y: types.number(cube.rotation.y, { range: [-2, 10] }),
-    z: types.number(cube.rotation.z, { range: [-2, 2] }),
+    x: types.number(cube.rotation.x, { range: [-1, 1] }),
+    y: types.number(cube.rotation.y, { range: [-1, 5] }),
+    z: types.number(cube.rotation.z, { range: [-1, 1] }),
   }),
   position: types.compound({
     px: types.number(cube.position.x, { range: [-100, 100] }),
@@ -224,7 +224,7 @@ const cubeObj = kvSheet.object("Cube", {
 // GUIからの入力をオブジェクトに反映
 cubeObj.onValuesChange((values) => {
   const { x, y, z } = values.rotation;
-  cube.rotation.set(x * Math.PI, y * Math.PI, z * Math.PI);
+  cube.rotation.set(x * 2 * Math.PI, y * 2 * Math.PI, z * 2 * Math.PI);
   const { px, py, pz } = values.position;
   cube.position.set(px, py, pz);
   const { sx, sy, sz } = values.scale;
