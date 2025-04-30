@@ -9,10 +9,10 @@ ICS MEDIAの記事『[デザイナーにもお勧め！ CSSもThree.jsもタイ�
 npm install
 ```
 
-起動は、以下のコマンドを行うか、package.jsonのscriptsのdevコマンドを実行することで開発画面が起動できます。
+package.jsonのscriptsのdevコマンドを実行することで開発画面が起動できます。
 
 ```bash
- npm run vite
+npm run dev
 ```
 
 ## ディレクトリ
